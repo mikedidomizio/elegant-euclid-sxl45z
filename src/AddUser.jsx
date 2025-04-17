@@ -3,16 +3,18 @@ import { gql, useMutation } from "@apollo/client";
 import { ALL_USERS } from ".";
 
 const ADD_USER = gql`
-  mutation AddUser($name: String) {
-    addUser(name: $name) {
+  mutation AddUser($name: String, $zodiac: String) {
+    addUser(name: $name, zodiac: $zodiac) {
       id
       name
+      zodiac
     }
   }
 `;
 
 export function AddUser() {
   const [name, setName] = useState("");
+  const [zodiac, setZodiac] = useState("");
   const [addUser] = useMutation(ADD_USER, {
     update: (cache, { data: { addUser: addUserData } }) => {
       const usersResult = cache.readQuery({ query: ALL_USERS });
@@ -40,11 +42,25 @@ export function AddUser() {
           />
         </div>
       </div>
+      <div>
+        <label htmlFor="zodiac">Zodiac</label>
+        <div>
+          <input
+            type="text"
+            name="zodiac"
+            id="zodiac"
+            placeholder="Zodiac"
+            onChange={(evt) => setZodiac(evt.target.value)}
+            value={zodiac}
+          />
+        </div>
+      </div>
       <button
         type="submit"
         onClick={() => {
-          addUser({ variables: { name } });
+          addUser({ variables: { name, zodiac } });
           setName("");
+          setZodiac("");
         }}
       >
         Add user

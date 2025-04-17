@@ -51,7 +51,7 @@ const MutationType = new GraphQLObjectType({
         const user = {
           id: userData[userData.length - 1].id + 1,
           name,
-          zodiac: "Aries",
+          zodiac,
         };
 
         userData.push(user);
