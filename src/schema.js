@@ -5,7 +5,6 @@ import {
   GraphQLID,
   GraphQLString,
   GraphQLList,
-  GraphQLNum,
 } from "graphql";
 
 faker.seed(18);
@@ -26,7 +25,7 @@ const UserType = new GraphQLObjectType({
 });
 
 const userData = faker.helpers.multiple(createRandomUser, {
-  count: 2000,
+  count: 5,
 });
 
 const QueryType = new GraphQLObjectType({
@@ -46,11 +45,13 @@ const MutationType = new GraphQLObjectType({
       type: UserType,
       args: {
         name: { type: GraphQLString },
+        zodiac: { type: GraphQLString },
       },
-      resolve: function (_, { name }) {
+      resolve: function (_, { name, zodiac }) {
         const user = {
           id: userData[userData.length - 1].id + 1,
           name,
+          zodiac: "Aries",
         };
 
         userData.push(user);
@@ -62,11 +63,13 @@ const MutationType = new GraphQLObjectType({
       args: {
         name: { type: GraphQLString },
         id: { type: GraphQLID },
+        zodiac: { type: GraphQLString },
       },
-      resolve: function (_, { name, id }) {
+      resolve: function (_, { name, zodiac, id }) {
         const user = {
           id,
           name,
+          zodiac,
         };
         userData[id] = user;
         return user;

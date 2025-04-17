@@ -13,11 +13,26 @@ import { createFragmentRegistry } from "@apollo/client/cache";
 import { link } from "./link.js";
 import { AddUser } from "./AddUser.jsx";
 
-export const UserFragment = gql`
-  fragment UserFragment on User {
+export const NameFragment = gql`
+  fragment NameFragment on User {
     name
+  }
+`;
+
+export const ZodiacFragment = gql`
+  fragment ZodiacFragment on User {
     zodiac
   }
+`;
+
+export const UserFragment = gql`
+  fragment UserFragment on User {
+    ...NameFragment
+    ...ZodiacFragment
+  }
+
+  ${NameFragment}
+  ${ZodiacFragment}
 `;
 
 export const ALL_USERS = gql`
@@ -95,6 +110,7 @@ function UseFragmentUserComponent({ id }) {
       __typename: "User",
       id,
     },
+    fragmentName: "UserFragment",
   });
 
   return <UserComponent user={user} />;
@@ -187,9 +203,11 @@ function App() {
 const client = new ApolloClient({
   link,
   cache: new InMemoryCache({
-    fragments: createFragmentRegistry(gql`
-      ${UserFragment}
-    `),
+    fragments: createFragmentRegistry(
+      gql`
+        ${UserFragment}
+      `
+    ),
   }),
 });
 
