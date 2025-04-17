@@ -53,6 +53,19 @@ export const ALL_USERS_NONREACTIVE = gql`
   }
 `;
 
+export const ALL_USERS_NONREACTIVE_PLUS_MEMO = gql`
+  query AllUsers {
+    users {
+      id
+      ...NameFragment
+      ...ZodiacFragment @nonreactive
+    }
+  }
+
+  ${NameFragment}
+  ${ZodiacFragment}
+`;
+
 const EDIT_USER = gql`
   mutation EditUser($name: String, $id: ID, $zodiac: String) {
     editUser(name: $name, id: $id, zodiac: $zodiac) {
@@ -171,6 +184,8 @@ function UsersTable({ query, shouldMemoize }) {
           {data?.users.map((user) => {
             if (query === ALL_USERS_NONREACTIVE) {
               return <UseFragmentUserComponent key={user.id} id={user.id} />;
+            } else if (query === ALL_USERS_NONREACTIVE_PLUS_MEMO) {
+              return <>Todo</>;
             } else if (shouldMemoize) {
               return <MemoizedUserComponent key={user.id} user={user} />;
             }
@@ -213,7 +228,7 @@ function App() {
               setQuery(ALL_USERS);
             }}
           />{" "}
-          Fast (memo)
+          Fast (memo UserComponent)
         </label>
         <label style={{ marginRight: "1rem" }}>
           <input
@@ -226,7 +241,20 @@ function App() {
               setQuery(ALL_USERS_NONREACTIVE);
             }}
           />{" "}
-          Fast (@nonreactive)
+          Fast (@nonreactive on the entire UserFragment)
+        </label>
+        <label style={{ marginRight: "1rem" }}>
+          <input
+            value="nonreactiveplusmemo"
+            type="radio"
+            name="queryVersion"
+            checked={query === ALL_USERS_NONREACTIVE_PLUS_MEMO}
+            onChange={() => {
+              setShouldMemoize(false);
+              setQuery(ALL_USERS_NONREACTIVE_PLUS_MEMO);
+            }}
+          />{" "}
+          Fast (@nonreactive on ZodiacFragment + memo name field)
         </label>
       </div>
       <UsersTable query={query} shouldMemoize={shouldMemoize} />
