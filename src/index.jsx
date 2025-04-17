@@ -54,10 +54,11 @@ export const ALL_USERS_NONREACTIVE = gql`
 `;
 
 const EDIT_USER = gql`
-  mutation EditUser($name: String, $id: ID) {
-    editUser(name: $name, id: $id) {
+  mutation EditUser($name: String, $id: ID, $zodiac: String) {
+    editUser(name: $name, id: $id, zodiac: $zodiac) {
       id
       name
+      zodiac
     }
   }
 `;
@@ -65,6 +66,7 @@ const EDIT_USER = gql`
 function UserComponent({ user }) {
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(user.name);
+  const [zodiac, setZodiac] = useState(user.zodiac);
   const [editUser] = useMutation(EDIT_USER);
 
   return (
@@ -77,8 +79,14 @@ function UserComponent({ user }) {
             id="name"
             onChange={(e) => {
               setName(e.currentTarget.value);
+              const updatedUserValues = {
+                name: e.currentTarget.value,
+                id: user.id,
+                zodiac: user.zodiac,
+              };
+
               editUser({
-                variables: { name: e.currentTarget.value, id: user.id },
+                variables: updatedUserValues,
               });
             }}
             value={name}
@@ -89,7 +97,33 @@ function UserComponent({ user }) {
           </>
         )}
       </td>
-      <td>{user.zodiac}</td>
+      <td>
+        {isEditing ? (
+          <input
+            type="text"
+            name="zodiac"
+            id="zodiac"
+            onChange={(e) => {
+              setZodiac(e.currentTarget.value);
+              const updatedUserValues = {
+                zodiac: e.currentTarget.value,
+                id: user.id,
+                name: user.name,
+              };
+
+              editUser({
+                variables: updatedUserValues,
+              });
+            }}
+            value={zodiac}
+          />
+        ) : (
+          <>
+            {" "}
+            {zodiac} {Math.random()}
+          </>
+        )}
+      </td>
       <td>
         <button
           onClick={() => {
